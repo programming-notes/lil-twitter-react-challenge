@@ -30,17 +30,18 @@ Your site needs to have the following functionality:
 
 #### Milestone 1
 
-> - On page load, the 50 most recent tweets are displayed in the 'river' running down the middle of the page.
-> - On page load, the 10 most popular hashtags are displayed.
-
+> - Determine what should be a component on the page
+> - React componentize the different parts of the app (use hard coded data where possible)
 
 #### Milestone 2
 
-> - A user can create a tweet, which will get saved into the database with a fake username, fake handle, and fake avatar (which is all handled server-side).
-> - The new tweet should appear atop the 'river', preferrably with some sort of animation.
+> - On page load, the 50 most recent tweets are displayed in the 'river' running down the middle of the page.
+> - On page load, the 10 most popular hashtags are displayed.
 
 #### Milestone 3
 
+> - A user can create a tweet, which will get saved into the database with a fake username, fake handle, and fake avatar (which is all handled server-side).
+> - The new tweet should appear atop the 'river', preferrably with some sort of animation.
 > - Any hashtags the tweet includes (e.g. #yolo), should also be associated with that tweet.
 
 #### Milestone 4
@@ -53,13 +54,11 @@ Your site needs to have the following functionality:
 
 
 
-### Release 1: Build
+### Release 1: Composition
 
-For now we're going to _ignore_ making constructors or using the prototype. We want to focus on writing lots of functions! Our functions should be small, single-purpose, and have clear inputs and outputs. We might use some of our functions together to make bigger functions too, we'd call this "function composition".
+Componentize the different parts of the application. Use hard coded values where it is necessary (i.e. timeline).
 
-Each function should be focused on one task. For example, one function might know how to fetch the 50 most recent tweets. Another may know how to take a tweet in and then render some HTML. Yet another function might know how to take an array of tweets and render some HTML.
-
-We're still thinking MVC, but these will be model, view and controller _functions_, not objects. Model functions might fetch and send data. View functions might make HTML. Controller functions might know how to respond to user input, fetching data and displaying it in the process.
+Each component should have one responsiblity which is defined subjectively. From experience, you will have a better intuition of when a component should be broken into smaller components. In the meantime, I would caution you to not over componentize your app. It's better to have larger components that can be refactored later rather than consolidating a bunch of smaller components.
 
 You should avoid any changes to the server-side code, although if you feel like changes are necessary, implement them and make sure the tests reflect your alterations. You will need to remove the filler elements in `app/views/index.html`. Structural changes to HTML and CSS should not be necessary.
 
@@ -67,56 +66,20 @@ As an example, here's a diagram that shows how you might think about the functio
 
 ![views diagram](doc/views.png)
 
-#### Common patterns
+### Release 2: Fetching Data from the Server
 
-When dealing with model style functions that use AJAX, a common pattern is to have the function fetch data from the server and return a _promise_ objects. A `Promise` is what jQuery returns when you call `$.ajax`. It's the thing that we call `.done()` on.
+Incorporate AJAX requests to replace the hard coded data from Release 1. You will need to utilize [React State and Lifecycle Methods](https://facebook.github.io/react/docs/component-specs.html).
 
-By returning a promise object, your fetching method (a model method) can keep its logic separate from the method that needs to use its data (say a controller method).
+To accomplish this release, you will also have to understand how to access different data sources from our API. Below is the documentation, but if this was not provided we could check out Rails route.
 
-Example:
 
-```javascript
-   $(document).ready(function() {
-      $("#weather-form").on("submit", function() {
-         handleWeatherFormSubmit();
-      })
-   })
+### Release 3: Creating Data on the Server
 
-   //Model style function
-   // Notice that it doesn't do any view work
-   function fetchWeather(zip) {
-      var requestPromise = $.ajax({url:"/weather", method:"GET", data:{zipcode: zip}});
-      return requstPromise;
-   }
+Add event handlers to the TweetBox form to submit a new Tweet to the database and update the UI without having to refresh the page or refetch from the server.
 
-   //Controller style function
-   // Notice that it uses our model function and our view function!
-   function handleWeatherFormSubmit() {
-      var zip = $("#zip-code").val();
-      var promiseFromAjax = fetchWeather(zip);
-
-      //Here the controller function attaches something with .done()
-      // so that it can use the view when the data comes back.
-      promiseFromAjax.done(function(weatherData) {
-         showWeather(weatherData)
-      })
-   }
-
-   //View style function
-   function showWeather(weatherInfo) {
-      $("#temperature").html("The temperature will be " + weatherInfo.temp)
-   }
-```
-
-**If this pattern doesn't make sense, that's ok. Just start coding and check-in with an instructor about this pattern when you're about 30 minutes in.**
-
-### Release 2: Expand
-
-Add an additional feature to your application:
-
- - add a system for checking if new tweets have been created since page load, using long-polling.
- - have the river of tweets only display 10 tweets, and dynamically load more when the user scrolls to the bottom of the page.
- - give the user the ability to click hashtags inside tweets, which would display tweets associated with that hashtag.
+Tip:
+- Components are not aware of each other. However if they are nested under a parent component, the parent could faciliate the data flow.
+- Remember that functions in JavaScript are treated like any other data type (aka "First Class Citizens"), so they could be passed as props from the parent component to the child component.
 
 ### Endpoint Documentation
 
@@ -208,3 +171,11 @@ The endpoint returns the created tweet as JSON.
    }
 ]
 ```
+
+### Stretch
+
+Add any or all features to your application:
+
+ - add a system for checking if new tweets have been created since page load, using long-polling.
+ - have the river of tweets only display 10 tweets, and dynamically load more when the user scrolls to the bottom of the page.
+ - give the user the ability to click hashtags inside tweets, which would display tweets associated with that hashtag.
